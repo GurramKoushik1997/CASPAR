@@ -1,0 +1,49 @@
+<aura:component controller="AccountDeactivateViaApiCtrl" implements="flexipage:availableForAllPageTypes,force:hasRecordId,force:lightningQuickAction" >
+    
+    <aura:attribute name="account" type="Account" />
+    <aura:attribute name="messageError" type="Boolean" />
+    <aura:attribute name="registered" type="Boolean" />
+    <aura:attribute name="deactivated" type="Boolean" default="false" />
+    
+    <aura:handler name="init" value="{!this}" action="{!c.init}" />
+    
+    <aura:if isTrue="{!v.messageError}">
+        <!-- Load error -->
+        <div class="userCreateError">
+            <ui:message title="Error" severity="error" closable="false">
+                An unknown error occurred. Please contact your system administrator.
+            </ui:message>
+        </div>
+    </aura:if>
+    
+    <aura:if isTrue="{!v.deactivated}">
+        <div class="userCreateError">
+            <ui:message title="Already deactivated" severity="info" closable="false">
+                Account is already deactivated in Caspar Backend.
+            </ui:message>
+        </div>
+    </aura:if>
+    
+    <aura:if isTrue="{!v.deactivated == false}">
+        <aura:if isTrue="{!v.registered == false}">
+            <div class="userCreateError">
+                <ui:message title="Not registered" severity="info" closable="false">
+                    Account is not yet registered in Caspar Backend.
+                </ui:message>
+            </div>
+        </aura:if>
+        
+        <aura:if isTrue="{!v.registered}">
+            <div class="slds-text-heading--small slds-align--absolute-center slds-m-top--large">
+                Are you sure you want to deactivate {!v.account.Name}?
+                <br/>
+                Deactivated accounts cannot be reactivated.
+            </div>
+            
+            <div class="slds-text-align--center slds-m-top--large">
+                <ui:button class="slds-button slds-button--destructive" press="{!c.deactivate}" disabled="{!v.registered == false}" label="Deactivate"/>
+            </div>
+        </aura:if>
+    </aura:if>
+    
+</aura:component>

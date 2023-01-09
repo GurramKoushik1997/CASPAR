@@ -1,0 +1,66 @@
+<aura:component controller="AccountSubmitViaApiCtrl" implements="flexipage:availableForAllPageTypes,force:hasRecordId,force:lightningQuickAction" >
+    
+    <aura:attribute name="account" type="Account" />
+    <aura:attribute name="messageError" type="Boolean" />
+    <aura:attribute name="validAccount" type="Boolean" />
+    <aura:attribute name="registered" type="Boolean" default="false" />
+    
+    <aura:handler name="init" value="{!this}" action="{!c.init}" />
+    
+    <aura:if isTrue="{!v.messageError}">
+        <!-- Load error -->
+        <div class="userCreateError">
+            <ui:message title="Error" severity="error" closable="false">
+                An unknown error occurred. Please contact your system administrator.
+            </ui:message>
+        </div>
+    </aura:if>
+    
+    <aura:if isTrue="{!v.registered}">
+        <!-- Load error -->
+        <div class="userCreateError">
+            <ui:message title="Already registered" severity="info" closable="false">
+                Account is already registered in Caspar Backend.
+            </ui:message>
+        </div>
+    </aura:if>
+    
+    <aura:if isTrue="{!v.registered == false}">
+        <aura:if isTrue="{!v.validAccount == false}">
+            <!-- Load error -->
+            <div class="userCreateError">
+                <ui:message title="Registration denied" severity="error" closable="false">
+                    Account needs a valid email address and country code.
+                </ui:message>
+            </div>
+        </aura:if>
+        
+        <aura:if isTrue="{!v.validAccount}">
+            <div class="slds-text-title slds-m-top--large">
+                The following information will be submitted to Caspar Backend:
+            </div>
+        </aura:if>
+        
+        <div class="slds-form--horizontal slds-m-top--medium">
+            <label class="slds-form-element__label">Account Name:</label>
+            <div class="slds-form-element__control">
+                <ui:outputText aura:id="accountName" value="{!v.account.Name}" />
+            </div>
+            <br/>
+            <label class="slds-form-element__label">Account Email:</label>
+            <div class="slds-form-element__control">
+                <ui:outputText aura:id="accountEmail" value="{!v.account.Email__c}" />
+            </div>
+            <br/>
+            <label class="slds-form-element__label">Country Code:</label>
+            <div class="slds-form-element__control">
+                <ui:outputText aura:id="accountCountryCode" value="{!v.account.Country_Code__c}" />
+            </div>
+        </div>
+        
+        <div class="slds-text-align--center slds-m-top--large">
+            <ui:button class="slds-button slds-button--brand" press="{!c.submit}" disabled="{!v.validAccount == false}" label="Submit"/>
+        </div>
+    </aura:if>
+    
+</aura:component>

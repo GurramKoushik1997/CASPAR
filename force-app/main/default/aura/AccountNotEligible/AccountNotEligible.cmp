@@ -1,0 +1,7 @@
+<aura:component implements="flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,lightning:availableForFlowScreens" access="global" >
+    
+   <!-- <div class="slds-p-top_medium slds-align_absolute-center slds-box" style="background-color:#CA3818; color:white">
+        &nbsp; &nbsp;&nbsp; &nbsp; Please also change the clinic name in our Product if this clinic is a customer</div>-->
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/> 
+        
+</aura:component>

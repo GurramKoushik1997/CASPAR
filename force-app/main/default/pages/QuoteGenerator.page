@@ -1,0 +1,5 @@
+<apex:page standardController="Opportunity" extensions="QuoteGenerator_CtrlExt" action="{!generate}">
+    <div style="text-align:center;width:100%;margin:10%">
+        Bitte warten ...
+    </div>
+</apex:page>

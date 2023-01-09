@@ -1,0 +1,255 @@
+<aura:component implements="flexipage:availableForAllPageTypes,force:hasRecordId,force:appHostable" access="global" controller="QuickNotesController">
+    
+    <aura:attribute name="currentUserName" type="String"/> 
+    <aura:attribute name="isEditable" type="Boolean" default="false" description="to edit Quick note"/>
+    <aura:attribute name="notesbody" type="String" default="" description="stores notes body"/>
+    <aura:attribute name="notes" type="Quick_Note__c[]" />
+    <aura:attribute name="isFileModalOpen" type="Boolean" default="false" description="to open file upload model"/>
+    <aura:attribute name="accId" type="String" default="" description="to store account Id, to lookup attach uploaded file also used for multiple secnarios"/>
+    <aura:attribute name="tab" type="String" default="" description="stores current tab Id"/>
+    <aura:attribute name="tempNoteId" type="String" default="" description="stores temeperary variable of note Id"/>
+    <aura:attribute name="options" type="Map" description="store list of type of meeting values"/>
+    <aura:attribute name="selectedOption" type="String" default="" description="stores selected type of meeting value"/>
+    <aura:attribute name="showParticipants" type="Boolean" default="false" description="shows select participents tab"/>
+    <aura:attribute name="InternalList" type="List" default="[]" description="Internal Picklist Values"/>
+    <aura:attribute name="ExternalList" type="List" default="[]" description="External Picklist Values"/>
+    <aura:attribute name="selectedInternalList" type="List" default="[]" description="Selected internal Picklist Values"/>
+    <aura:attribute name="selectedExternalList" type="List" default="[]" description="Selected external Picklist Values"/>
+    <aura:attribute name="isExternalOther" type="Boolean" default="false" description="if external selected value is Others"/>
+    <aura:attribute name="otherParticipants" type="String" default="" description="to store other participants name"/>
+    <aura:attribute name="isExportToPDF" type="boolean" default="true"/>
+    <aura:attribute name="NotesList" type="List" />   
+    <aura:attribute name="isSelectNotes" type="boolean" default="false"/>
+    <aura:attribute name="isSelectAll" type="boolean" default="false"/>
+    <aura:attribute name="accountName" type="string" default="false"/>
+    <aura:attribute name="MeetingDT" type="Date"/>
+    <aura:attribute name="DueDT" type="Date"/>
+    <aura:attribute name="showNextSteps" type="boolean" default="false"/>
+    <aura:attribute name="TaskComment" type="String" default="" description="stores Task Comment"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <lightning:card class="slds-card_boundary" title="" >
+        <p class="slds-p-horizontal_small">
+            <lightning:tabset selectedTabId="{!v.tab}">
+                <!-- tab 1 -->
+                <lightning:tab label="Add Note" id="one" iconName="utility:note">
+                    <div class="slds-grid slds-wrap slds-m-vertical_x-small">
+                        <lightning:select name="select" label=""  class="priorityAlign" value="{!v.selectedOption}">
+                            <aura:iteration items="{!v.options}" var="op">
+                                <option text="{!op.value}" value="{!op.key}"></option>
+                            </aura:iteration>
+                        </lightning:select>
+                    </div>
+                    <div class="customtxtarea">
+                        <lightning:inputrichtext value="{!v.notesbody}" formats="['bold', 'list']" />
+                    </div>
+                    <div class="slds-grid slds-wrap slds-m-vertical_x-small">
+                        <lightning:button label="Add Participents" variant="brand" onclick="{!c.addParticipents}" class="addNoteButton" /> &nbsp;
+                        <lightning:button label="Next steps" variant="brand" onclick="{!c.nextSteps}" class="nextStepsButton" /> &nbsp;
+                        <lightning:input type="date" name="Date" label="Meeting Date" value="{!v.MeetingDT}" class="Date-input" />
+                    </div>
+                </lightning:tab>
+                <!--// tab 1 -->
+                <!-- tab 2 -->
+                <lightning:tab label="My Notes" id="two" iconName="utility:notebook">
+                    <aura:if isTrue="{!not(empty('v.notes'))}">
+                        <div style="height: 316px; overflow: auto;">
+                            <aura:iteration items="{!v.notes}" var="item" indexVar="i">
+                                <div class="slds-m-bottom_small slds-card_boundary">
+                                    <h2 style="background: #00A6AA; color: #fff; padding: 3px;">
+                                        {!item.Name} 
+                                        <span>
+                                            <div class="slds-float--right">
+                                                <lightning:buttonIcon iconName="utility:upload" name ="Upload" alternativeText="Upload" value="{!i}" variant="bare" onclick="{!c.fileUploadModal}" class="uploadButton"/>
+                                                <lightning:buttonIcon iconName="utility:delete" name ="Delete" alternativeText="Delete" value="{!i}" variant="bare" onclick="{!c.handleCancel}" class="DeleteButton"/>
+                                            </div>
+                                        </span>
+                                        <!--<span class="closeButton" onclick="{!c.handleCancel}" id="{!i}"> x </span> -->
+                                    </h2>
+                                    <aura:if isTrue="{!item.isEdit__c}">
+                                        <div class="slds-float--right">
+                                            <lightning:buttonIcon iconName="utility:save" name ="Save" alternativeText="Save" value="{!i}" variant="bare" onclick="{! c.handleSave }" size="large" class="save-icon-button" />
+                                        </div><br/><br/>
+                                        <lightning:inputRichText value="{!item.Body__c}" formats="['bold', 'list']" />
+                                        <aura:set attribute="else">
+                                            <strong>Type of Meeting : </strong>{!item.Type_of_Meeting__c}<br/>
+                                            <strong>Internal Participants : </strong>{!item.Internal_Participants__c}<br/>
+                                            <strong>External Participants : </strong>{!item.External_Participants__c}<br/>
+                                            <aura:if isTrue="{!item.Other_Participants__c}">
+                                                <strong>Other Participants : </strong>{!item.Other_Participants__c}<br/>
+                                            </aura:if>
+                                            
+                                            <div class="slds-float--right">
+                                                <lightning:buttonIcon iconName="utility:edit" name ="Edit" alternativeText="Edit" value="{!i}" variant="bare" onclick="{! c.handleEdit }" class="icon-button"/>
+                                            </div>
+                                            <h2 style="background: #00A6AA; color: #fff; padding: 2px;"></h2>
+                                            <lightning:formattedRichText value="{!item.Body__c}" />
+                                        </aura:set>
+                                    </aura:if>
+                                </div>
+                            </aura:iteration>
+                        </div>
+                        <aura:set attribute="else">
+                            No notes are available!
+                        </aura:set>
+                    </aura:if>
+                </lightning:tab>
+                <!--// tab 2 -->
+                <aura:if isTrue="{!v.showParticipants}">
+                    <div class="slds-scrollable_y">
+                        <!-- tab 3 -->
+                        <lightning:tab label="Participents" id="three" iconName="utility:multi_select_checkbox" class="threetab slds-scrollable_y">
+                            <lightning:dualListbox aura:id="Select Internal Participants"
+                                                   name="Internal Participants"
+                                                   label="Internal Participants"
+                                                   sourceLabel="Available"
+                                                   selectedLabel="Selected"
+                                                   size = "3"
+                                                   options="{!v.InternalList }"
+                                                   value="{!v.selectedInternalList}"
+                                                   onchange="{!c.handleInternalChange}"/>
+                            <lightning:dualListbox aura:id="Select External Participants"
+                                                   name="External Participants"
+                                                   label="External Participants"
+                                                   sourceLabel="Available"
+                                                   selectedLabel="Selected"
+                                                   size = "3"
+                                                   options="{!v.ExternalList }"
+                                                   value="{!v.selectedExternalList}"
+                                                   onchange="{!c.handleExternalChange}"/><br/>
+                            
+                            <aura:if isTrue="{!v.isExternalOther}">
+                                <label lightning-input_input="" for="color-1" class="slds-form-element__label slds-color-picker__summary-label"><strong>Other Participants</strong></label>
+                                <lightning:helptext iconVariant="brand" content="Enter Participants with comma(,) seperated."/>
+                                <lightning:input name="Enter Participants" label="Enter Participants" value="{!v.otherParticipants}" placeholder="Type addidtional Participants...."/>
+                            </aura:if>
+                            <div class="ParticipantsCancel">
+                                <lightning:button label="Done" variant="brand" onclick="{!c.AllParticipents}"/>
+                                <lightning:button label="Cancel" variant="brand" onclick="{!c.closeParticipents}"/>
+                            </div>
+                        </lightning:tab>
+                        <!--// tab 3 -->
+                    </div>
+                </aura:if>
+                <aura:if isTrue="{!v.showNextSteps}">
+                    <div class="slds-scrollable_y">
+                        <!-- tab 4 -->
+                        <lightning:tab label="Next Steps" id="four" iconName="utility:date_time" class="threetab slds-scrollable_y">
+                            <lightning:input type="date" name="Date" label="Due Date" value="{!v.DueDT}" class="Date-input" />
+                            <div class="customtxtarea">
+                                <lightning:input type="text" placeholder="type your Comments..." label="Next Steps" value="{!v.TaskComment}" />
+                            </div>
+                            <div class="ParticipantsCancel">
+                                <lightning:button label="Done" variant="brand" onclick="{!c.SaveNextSteps}"/>
+                                <lightning:button label="Cancel" variant="brand" onclick="{!c.closeNextSteps}"/>
+                            </div>
+                        </lightning:tab>
+                        <!--// tab 4 -->
+                    </div>
+                </aura:if>
+                <aura:if isTrue="{!v.isFileModalOpen}">
+                    <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                        <div class="slds-modal__container">
+                            <header class="slds-modal__header">
+                                <button class="slds-button slds-button_icon slds-modal__close" title="Close" onclick="{!c.closeFileModal}">
+                                    <lightning:icon variant="bare" iconName="utility:close" class="white" size="small"/>
+                                </button>
+                                <h2 id="modal-heading-01" class="slds-modal__title slds-hyphenate"> File Upload </h2>
+                            </header>
+                            <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                                <p style="text-align: center;">
+                                    <lightning:fileUpload name="fileUploader"
+                                                          multiple="false"
+                                                          recordId="{!v.accId}"
+                                                          onuploadfinished="{!c.handleUploadFinished}"/>
+                                </p>
+                            </div>
+                        </div>
+                    </section>
+                    <div class="slds-backdrop slds-backdrop_open"></div>
+                </aura:if>
+            </lightning:tabset>
+        </p>
+        <aura:set attribute="footer">
+            <aura:if isTrue="{!v.tab == 'one'}">
+                <!-- Submit button -->
+                    <div class="submitNote">
+                        <lightning:button label="Submit" variant="brand" onclick="{!c.addNote}"/>
+                    </div>
+                    <!-- Submit button -->
+            </aura:if>
+            <aura:if isTrue="{!v.tab == 'two'}">
+                <aura:if isTrue="{!v.isExportToPDF}">
+                    <lightning:button name="Export to PDF" label="Export to PDF" variant="brand" class="export-button" onclick="{!c.exportoPDF}"/>
+                </aura:if>
+            </aura:if>
+        </aura:set>
+    </lightning:card>
+    <aura:if isTrue="{!v.isSelectNotes}">
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <button class="slds-button slds-button_icon slds-modal__close" title="Close" onclick="{!c.closeSelectModal}">
+                        <lightning:icon variant="bare" iconName="utility:close" class="white" size="small"/>
+                    </button>
+                    <h2 id="modal-heading-01" class="slds-modal__title slds-hyphenate"> {!v.accountName} </h2>
+                </header>
+                <div class="slds-modal__content" id="modal-content-id-1">
+                    <div class="slds-m-around_xx-small">
+                        <!--Contact List Table-->
+                        <div class="slds-table--header-fixed_container" style="height:190px;">
+                            <div class="slds-scrollable_y" style="height:100%;">
+                                <table class="slds-table slds-table--bordered slds-table--cell-buffer slds-table--header-fixed" role="grid">      
+                                    <thead>  
+                                        <tr class="slds-text-title--caps">
+                                            <th>           
+                                                <label class="slds-checkbox">
+                                                    <ui:inputCheckbox value="{!v.isSelectAll}" change="{!c.handleSelectAllContact}" aura:id="selectAll"/>
+                                                    <span class="slds-checkbox--faux" />
+                                                    <span class="slds-form-element__label"></span>
+                                                </label>Select All
+                                            </th>
+                                            <th scope="col">
+                                                <div class="slds-truncate" title="Name" style="text-align:center;">Meetings</div>
+                                            </th>
+                                            <th scope="col">
+                                                <div class="slds-truncate" title="Account" style="text-align:center;">Type of Meeting</div>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <aura:iteration items="{!v.notes}" var="con">
+                                            <tr>
+                                                <th>
+                                                    <label class="slds-checkbox">
+                                                        <ui:inputCheckbox aura:id="checkNote" value="" text="{!con.Id}"/>
+                                                        <span class="slds-checkbox--faux" />
+                                                        <span class="slds-form-element__label"></span>
+                                                    </label>
+                                                </th>
+                                                <th scope="row">
+                                                    <div class="slds-truncate" title="{!con.Name}" style="text-align:center;">{!con.Name}</div>
+                                                </th>
+                                                <td>
+                                                    <div class="slds-truncate" title="{!con.Type_of_Meeting__c}" style="text-align:center;">{!con.Type_of_Meeting__c}</div>
+                                                </td>
+                                            </tr>
+                                        </aura:iteration>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div style="height:50px">
+                            <br/>
+                            <div style="float:right;">
+                                <lightning:button label="Generate PDF" class="slds-button_brand" onclick="{!c.handleSelectedContacts }"  />
+                            </div>
+                            <br/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </aura:if>
+</aura:component>

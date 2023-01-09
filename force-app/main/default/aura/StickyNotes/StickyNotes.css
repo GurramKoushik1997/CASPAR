@@ -1,0 +1,80 @@
+.THIS .slds-card__header-title {
+    font-weight: 600 !important;
+}
+.THIS .customtxtarea .slds-rich-text-area__content {
+	height: 180px !important;
+    max-height: 180px !important;
+}
+
+.THIS .customtxtarea .slds-rich-text-editor__textarea .slds-grid ql-container {
+	height: 180px !important;
+	max-height: 180px !important;
+}
+
+.THIS ::-webkit-scrollbar {
+  width: 5px;
+}
+
+.THIS .closeButton {
+    float: right;
+    border: 1px solid #fff;
+    padding: 0 5px;
+    cursor: pointer;
+    background: #00A6AA;
+    font-weight: 600;
+    margin-right: -2px;
+    margin-top: -1px;
+}
+
+.THIS .icon-button{
+    color: #00A6AA;
+    margin-top: -41px;
+}
+.THIS .save-icon-button{
+    color: #00A6AA;
+}
+.THIS .addNoteButton {
+    background-color:#00A6AA;
+    border: 1px solid #00A6AA;
+    align-items: right;
+    margin-top: 25px;
+}
+.THIS .uploadButton {
+    border: 1px solid #00A6AA;
+    color: #FFFFFF;
+    align-items: center;
+}
+.THIS .DeleteButton {
+    border: 1px solid #00A6AA;
+    color: #FFFFFF;
+}
+.THIS .priorityAlign{
+    margin-top: -20px;
+    width: 150px;
+}
+.THIS .submitNote{
+    float: right;
+}
+.THIS .threetab{
+    height: 255px;
+    overflow: auto;
+}
+.THIS .ParticipantsCancel{
+    float: right;
+    margin-top: 3%;
+}
+.THIS .export-button{
+    margin-right: -305px !important;
+}
+.THIS .slds-card__footer{
+    height : 48px !important;
+}
+.THIS .Date-input{
+    width: 116px;
+}
+.THIS .nextStepsButton{
+    width : 100px;
+    background-color:#00A6AA;
+    border: 1px solid #00A6AA;
+    margin-top: 25px;
+}

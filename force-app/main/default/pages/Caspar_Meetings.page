@@ -1,0 +1,92 @@
+<apex:page renderAs="PDF" standardController="Account" extensions="QuickNotesPdfController" title="Caspar_Meetings" docType="html-5.0" readOnly="true" applyHtmlTag="false" showHeader="false">
+    
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+        <style>
+            p {
+            margin: 1px;
+            padding: 1px;
+            }
+            .par {
+            text-indent: -2em;
+            margin-left: 2em;
+            }
+            @page {
+            size:A3;
+            margin-top: 2in;
+            margin-bottom: 0.6in;
+            @top-left {content: element(header); }
+            @bottom-left {content: ""; font-size: 13px; font-family: sans-serif; }
+            @bottom-center{}
+            @bottom-right {content: counter(page) " of " counter(pages);font-size: 13px; font-family: sans-serif;}
+            }
+            
+            .header {text-align: left; position: running(header);}
+            
+            .pagenumber:before {
+            content: counter(page);
+            }
+            
+            .pagecount:before {
+            content: counter(pages);
+            }
+            div.footer{
+            page-break-after:avoid;
+            page-break-before:avoid;                          
+            page-break-inside:avoid;
+            position: running(footer);
+            }
+            table { page-break-inside:auto; page-break-after:auto}
+        </style>
+    </head>
+    <div class="header">
+        <apex:image url="{!URLFOR($Resource.caspar_logo)}" width="200" height="40"/>
+        <br/>
+    </div>
+    <div class="footer">
+    </div>
+    <body>
+        
+        
+        <apex:repeat value="{!quickNotesRecords}" var="q">
+            <p style='font-size:8px;font-family:"Calibri",sans-serif;text-align:left;'><strong><span style='font-size:13px;font-family:"Arial",sans-serif;'> {!q.Name} </span></strong></p>
+            <table border="1" align="center" width="100%" style="border-collapse:collapse;">
+                <tr border="0" width="100%;">
+                    <td style="border: 1pt solid #C0C0C0; text-align: left; font-size: 11px;"><br/>&nbsp; <strong>Meeting: </strong> <br/><br/> </td>
+                    <td style="border: 1pt solid #C0C0C0; width: 30%; text-align: left; font-size: 11px;">&nbsp; {!q.Type_of_Meeting__c} </td>
+                </tr>
+                <tr border="0" width="100%;">
+                    <td style="border: 1pt solid #C0C0C0; width: 30%; text-align: left; font-size: 11px;"><br/>&nbsp; <strong>Teilnehmer Caspar Health: </strong> <br/><br/> </td>
+                    <td style="border: 1pt solid #C0C0C0; width: 30%; text-align: left; font-size: 11px;">&nbsp; {!q.Internal_Participants__c} </td>
+                </tr>
+                <tr border="0" width="100%;">
+                    <td style="border: 1pt solid #C0C0C0; width: 30%; text-align: left; font-size: 11px;"><br/>&nbsp; <strong>Teilnehmer: </strong> <br/><br/> </td>
+                    <td style="border: 1pt solid #C0C0C0; width: 30%; text-align: left; font-size: 11px;">&nbsp; {!q.External_Participants__c} </td>
+                </tr>
+                <tr border="0" width="100%;">
+                    <td style="border: 1pt solid #C0C0C0; width: 30%; text-align: left; font-size: 11px;"><br/>&nbsp; <strong>Zusätzliche Teilnehmer: </strong> <br/><br/> </td>
+                    <td style="border: 1pt solid #C0C0C0; width: 30%; text-align: left; font-size: 11px;">&nbsp; {!q.Other_Participants__c} </td>
+                </tr>
+                <tr border="0" width="100%;">
+                    <td style="border: 1pt solid #C0C0C0; width: 30%; text-align: left; font-size: 11px;"><br/>&nbsp; <strong>Nächste Schritte: </strong> <br/><br/> </td>
+                    <td style="border: 1pt solid #C0C0C0; width: 30%; text-align: left; font-size: 11px;">
+                        &nbsp;<strong>Tasks: </strong>{!q.Tasks__c}
+                        <br/>
+                        &nbsp;<strong>WhatId: </strong>{!q.Account__r.Name}
+                        <br/>
+                        &nbsp;<strong>Due Date: </strong>
+                        <apex:outputText value="{0,date,dd.MM.yyyy}">
+                            <apex:param value="{!q.Task_Due_Date__c}" />
+                        </apex:outputText>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2" style="border: 1pt solid #C0C0C0; text-align:left; font-size: 13px;">&nbsp;<b>Besprechungsnotizen:</b>
+                     &nbsp;<apex:outputText escape="false" value="{!q.Body__c}"/>
+                    </td>
+                </tr>
+                <br/>
+            </table>
+        </apex:repeat>
+    </body>
+</apex:page>

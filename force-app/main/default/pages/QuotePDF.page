@@ -1,0 +1,958 @@
+<apex:page standardController="Opportunity" extensions="QuotePDF_CtrlExt" renderAs="pdf" sidebar="false" showHeader="false" applyHtmlTag="false">
+     
+    <head>
+        <style type="text/css">
+            @page{
+            	margin-top: 140px;
+            	margin-bottom: 140px;
+            	margin-left: 0;
+            	margin-right: 0;
+            	padding-left: 0;
+            	padding-right: 0;
+            
+                @top-center{
+                    content: element(header);
+                }
+                @bottom-center{
+                    content: element(footer);
+                }
+            }
+            
+            @page:first {
+            	margin-top: -8px;
+            	margin-bottom: 100px;
+            
+            	@top-center {
+            		content: normal;
+            	}
+            
+	            @bottom-center {
+            		content: element(footer_first);
+    	        }
+            }
+            
+            body,
+            div,
+            p,
+            tr,
+            th,
+            td {
+            font-family: sans-serif;
+            font-size: 14px;
+            color: #231f20;
+            }
+            
+            table {
+            border-spacing: 0;
+            border-collapse: collapse;
+            }
+            
+            .bold {
+            font-weight: 600;
+            }
+            
+            .left {
+            text-align: left !important;
+            }
+            
+            .center {
+            text-align: center !important;
+            }
+            
+            .right {
+            text-align: right !important;
+            }
+            
+            .new_page {
+            padding-left: 60px;
+            padding-right: 60px;
+            }
+            
+            .new_page {
+            page-break-before: always;
+            }
+            
+            #hero {
+            width: 100%;
+            height: 550px;
+            }
+            
+            #hero img {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            }
+            
+            #hero_cut {
+            position: absolute;
+            top: 535px;
+            z-index: 2;
+            width: 100%;
+            height: 100px;
+            background-color: #ffffff;
+            }
+            
+            #title {
+            position: absolute;
+            top: 80px;
+            right: 87px;
+            z-index: 2;
+            color: #fff;
+            font-size: 27px;
+            font-weight: 600;
+            }
+            
+            #mockup_image {
+            position: absolute;
+            top: 415px;
+            left: 82px;
+            z-index: 3;
+            width: 280px;
+            }
+            
+            #mockup_image img {
+            width: 100%;
+            height: auto;
+            }
+            
+            #first_page_content {
+            position: relative;
+            z-index: 3;
+            margin-left: 50%;
+            padding-right: 60px;
+            }
+            
+            #first_logo {
+            margin-top: 62px;
+            margin-left: 30px;
+            height: 57px;
+            }
+            
+            #first_logo img {
+            height: 100%;
+            }
+            
+            #subtitle {
+            margin-top: 27px;
+            text-align: center;
+            font-size: 24px;
+            line-height: 34px;
+            }
+            
+            #contact {
+            margin-top: 80px;
+            margin-left: 35px;
+            line-height: 20px;
+            }
+            
+            #contact_heading {
+            margin-bottom: 10px;
+            font-weight: 600;
+            }
+            
+            #contact span {
+            padding-right: 8px;
+            }
+            
+            .header {
+            width:100%;
+            padding-left: 60px;
+            padding-right: 60px;
+            position: running(header);
+            }
+            
+            .header_image {
+            position: absolute;
+            top: 0;
+            z-index: 1;
+            padding-left: 60px;
+            padding-right: 60px;
+            }
+            
+            .header_image img,
+            .footer_image img {
+            width: 100%;
+            height: auto;
+            }
+            
+            .logo {
+            position: relative;
+            margin-top: 40px;
+            padding-left: 10px;
+            z-index: 2;
+            height: 40px;
+            }
+            
+            .logo img {
+            height: 100%;
+            }
+            
+            .quote_header.first {
+            margin-bottom: 100px;
+            }
+            
+            .quote_header.second {
+            margin-top: 15px;
+            margin-bottom: 30px;
+            }
+            
+            .quote_header table,
+            .products table,
+            #terms table {
+            width: 100%;
+            }
+            
+            .quote_header td {
+            vertical-align: bottom;
+            padding: 0;
+            margin: 0;
+            }
+            
+            .company_address {
+            font-size: 10px;
+            margin-bottom: 6px;
+            }
+            
+            .company_address > span {
+            border-bottom: 1px solid #ccecec;
+            }
+            
+            .headline {
+            font-size: 18px;
+            font-weight: 600;
+            }
+            
+            .date {
+            text-align: right;
+            }
+            
+            .headline-container {
+            margin-bottom: 80px;
+            }
+            
+            .letter table td {
+            padding: 0;
+            margin: 0;
+            }
+            
+            .products table th,
+            .products table td {
+            vertical-align: top;
+            font-size: 13px;
+            text-align: center;
+            padding: 3px;
+            }
+            
+            .products table td {
+            color: #666465;
+            }
+            
+            .products table th {
+            font-weight: 600;
+            }
+            
+            .products .product td {
+            border-top: 1px solid #ccecec;
+            }
+            
+            .product_description {
+            text-align: left !important;
+            }
+            
+            .product_description ul {
+            list-style-position: inside;
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            }
+            
+            .product_name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #231f20;
+            padding-bottom: 10px;
+            }
+            
+            .products .summary {
+            width: 100%;
+            margin-top: 100px;
+            }
+            
+            .products .summary td {
+            text-align: left;
+            }
+            
+            .products .summary .total td {
+            border-top: 1px solid #ccecec;
+            padding-top: 6px;
+            }
+            
+            #terms {
+            margin-bottom: 100px;
+            }
+            
+            #terms table td {
+            vertical-align: top;
+            }
+            
+            .therapiemodul {
+            padding-top: 40px;
+            text-align: justify;
+            }
+            
+            .footer_first {
+            position: running(footer_first);
+            }
+            
+            .footer {
+            width: 100%;
+            padding-left: 60px;
+            padding-right: 60px;
+            position: running(footer);
+            }
+            
+            .footer table {
+            width: 100%;
+            margin-bottom: 20px;
+            }
+            
+            .footer table td,
+            .pagecounter {
+            font-size: 10px;
+            color: #a6a7a8;
+            }
+            
+            .pagecounter {
+            text-align: right;
+            padding-right: 150px;
+            margin-bottom: 40px;
+            }
+            
+            .pagenumber:before{
+            content: counter(page);
+            }
+            
+            .pagecount:before{
+            content: counter(pages);
+            }
+            
+            .footer_image {
+            position: absolute;
+            bottom: -4px;
+            padding-left: 60px;
+            padding-right: 60px;
+            }
+            
+        </style>
+    </head>
+    
+    <body>
+        <div class="header">
+            <div class="header_image">
+                <img src="{!$Resource.quote_header_image}"/>
+            </div>
+            <div class="logo">
+                <img src="{!$Resource.caspar_logo_2}"/>
+            </div>
+        </div>
+        
+        <div class="footer_first">
+            <div class="footer_image">
+                <img src="{!$Resource.quote_footer_image}"/>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <div>
+                <table>
+                    <td style="width: 33%">
+                        <span class="bold">GOREHA GmbH</span><br/>
+                        Neue Schönhauser Strasse 20, 10178 Berlin<br/>
+                        030 12 08 29 19<br/>
+                        support@caspar-health.com<br/>
+                        www.caspar-health.com
+                    </td>
+                    <td style="width: 30%">
+                        <span class="bold">Geschäftsführer</span>: Maximilian Michels,<br/>
+                        Maximilian von Waldenfels,<br/>
+                        Benjamin Pochhammer<br/>
+                        <span class="bold">Registereintragung:</span><br/>
+                        Amtsgericht Charlottenburg,
+                    </td>
+                    <td style="width: auto">
+                        HRB 188988 B<br/>
+                        Finanzamt Berlin<br/>
+                        Steuernummer: 30/313/31201<br/>
+                        <span class="bold">Bankverbindung:</span> Deutsche Bank,<br/>
+                        IBAN: DE17 1007 0100 0269 6367 00
+                    </td>
+                </table>
+            </div>
+            <div class="pagecounter">
+                <span class="pagenumber"/> / <span class="pagecount"/>
+            </div>
+            <div class="footer_image">
+                <img src="{!$Resource.quote_footer_image}"/>
+            </div>
+        </div>
+        
+        <div id="content">
+            <!-- PAGE 1 -->
+            <div id="hero">
+                <img src="{!$Resource.quote_image_hero_2}" />
+            </div>
+            
+            <div id="hero_cut" />
+            
+            <div id="title">
+                ANGEBOT
+            </div>
+            
+            <div id="mockup_image">
+                <img src="{!$Resource.quote_image_mockup_2}" />
+            </div>
+            
+            <div id="first_page_content">
+                <div id="first_logo">
+                    <img src="{!$Resource.caspar_logo}" />
+                </div>
+                <div id="subtitle">
+                    Digitale Rehabilitation.<br/>
+                    Zeit- und ortsunabhängig!
+                </div>
+                <div id="contact">
+                    <div id="contact_heading">
+                        Ihr Ansprechpartner:
+                    </div>
+                    <div>
+                        {!opp.Owner.Name}<br/>
+                        <apex:outputpanel rendered="{!opp.Owner.Title != ''}" layout="none">
+                            {!opp.Owner.Title}<br/>
+                        </apex:outputpanel>
+                        <apex:outputpanel rendered="{!opp.Owner.Phone != ''}" layout="none">
+                            <span>M:</span>{!opp.Owner.Phone}<br/>
+                        </apex:outputpanel>
+                        <span>E:</span>{!opp.Owner.Email}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- PAGE 1 OLD -->
+            <!--<div id="hero">
+                <img src="{!$Resource.quote_image_hero}" />
+            </div>
+            
+            <div id="first_page">
+                <table style="width:100%">
+                    <td style="width:50%">  
+                        <div id="title">
+                            Angebot
+                        </div>
+                        <div id="first_logo">
+                            <img src="{!$Resource.caspar_logo}" />
+                        </div>
+                        <div id="subtitle">
+                            Ihre Therapie-Plattform<br/>
+                            für die nachhaltige<br/>
+                            Patient*innenbetreuung
+                        </div>
+                        <div id="contact">
+                            <div id="contact_heading">
+                                Ihr Ansprechpartner:
+                            </div>
+                            <div>
+                                {!opp.Owner.Name}<br/>
+                                <apex:outputpanel rendered="{!opp.Owner.Title != ''}" layout="none">
+                                    {!opp.Owner.Title}<br/>
+                                </apex:outputpanel>
+                                <apex:outputpanel rendered="{!opp.Owner.Phone != ''}" layout="none">
+                                    <span>M:</span>{!opp.Owner.Phone}<br/>
+                                </apex:outputpanel>
+                                <span>E:</span>{!opp.Owner.Email}
+                            </div>
+                        </div>
+                    </td>
+                    <td id="mockup_image" style="width:50%">
+                    	<img src="{!$Resource.quote_image_mockup}" />
+                    </td>
+                </table>
+            </div>-->
+            
+            <!-- PAGE 2 -->
+            <div class="new_page">
+                <div class="quote_header first">
+                    <table>
+                        <td class="letterhead">
+                            <div class="company_address">
+                                <span>GOREHA GmbH - Neue Schönhauser Strasse 20 - 10178 Berlin</span>
+                            </div>
+                            
+                            <div class="client_address">
+                                {!opp.Account.Name}<br/>
+                                <apex:outputPanel rendered="{!clientContact.size > 0}">
+                                    {!clientContact[0].Contact.Name}<br/>
+                                </apex:outputPanel>
+                                {!opp.Account.BillingStreet}<br/>
+                                {!opp.Account.BillingPostalCode} {!opp.Account.BillingCity}
+                            </div>
+                        </td>
+                        <td class="date">
+                            Datum: {!quoteDate}
+                        </td>
+                    </table>
+                </div>
+                
+                <div class="headline-container">
+                    <div class="headline">
+                        Angebot {!opp.Name}<br/>
+                        Tele-Therapie-Plattform für {!opp.Account.Name}
+                    </div>
+                </div>
+                
+                <div class="letter">
+                    <p>
+                        <apex:outputPanel rendered="{!clientContact.size > 0}">
+                            Sehr {!IF(clientContact[0].Contact.Gender__c == 'Female', 'geehrte Frau', 'geehrter Herr')} {!clientContact[0].Contact.Name},<br/>
+                        </apex:outputPanel>
+                        <apex:outputPanel rendered="{!clientContact.size == 0}">
+                            Sehr geehrte Damen und Herren,
+                        </apex:outputPanel>
+                    </p>
+                    <p>
+                        vielen Dank für Ihre freundliche Anfrage.<br/>
+                        Wir freuen uns über Ihr Interesse an der digitalen Therapie und stellen Ihnen sehr gerne<br/>
+                        unser Angebot vor.
+                    </p>
+                    <p style="padding-top:15px">
+                        Wir setzen uns in den nächsten Tagen mit Ihnen in Verbindung.
+                    </p>
+                    <p style="padding-top:30px;padding-bottom:10px">
+                        Mit freundlichen Grüßen
+                    </p>
+                    <!--<table>
+                        <td style="width:200px">
+                            <div>
+                                <img src="{!$Resource.quote_signature_hollaender}" height="40px" />
+                            </div>
+                            Richard Holländer<br/>
+                            Vertriebsleiter
+                        </td>
+                        
+                        <td>
+                            <div>
+                                <img src="{!$Resource.quote_signature_michels}" height="40px" />
+                            </div>
+                            Maximilian Michels<br/>
+                            Geschäftsführer
+                        </td>
+                    </table>-->
+                    <div>
+                        <img src="{!$Resource.quote_signature_winter}" width="130px" />
+                    </div>
+                    Dominik Winter<br/>
+                    Head of Sales
+                </div>
+                
+            </div>
+            
+            <!-- PAGE 3 -->
+            <apex:outputPanel rendered="{!products1.size > 0}" layout="none">
+                <div class="new_page">
+                    <div class="quote_header second">
+                        <table>
+                            <td class="headline">
+                                Angebot {!opp.Name}<br/>
+                                Lizenz Tele-Therapie-Plattform
+                            </td>
+                            <td class="date">
+                                Datum: {!quoteDate}
+                            </td>
+                        </table>
+                    </div>
+                    
+                    <div class="products">
+                        <table>
+                            <tr>
+                                <th style="width:50px;">Pos.</th>
+                                <th class="product_description">Bezeichnung</th>
+                                <th>Menge<br/>(Stück)</th>
+                                <th>Fälligkeit</th>
+                                <th style="min-width:80px;">Listen-<br/>preis (€)</th>
+                                <th style="{!IF(oli1Discount != 0, 'min-width:70px', 'display:none')}">Rabatt<br/>(%)</th>
+                                <th style="min-width:80px;">Stück-<br/>preis (€)</th>
+                            </tr>
+                            <apex:variable value="1" var="pos1"/>
+                            <apex:repeat value="{!products1}" var="p">
+                                <tr class="product">
+                                    <td style="width:50px;">{!pos1}</td>
+                                    <td class="product_description">
+                                        <div class="product_name">{!p.oli.product2.name}</div>
+                                        <ul>
+                                            <apex:repeat value="{!p.specs}" var="s">
+                                                <apex:outputPanel rendered="{!s != null}" layout="none">
+                                                    <li>&#8226; {!s}</li>
+                                                </apex:outputPanel>
+                                            </apex:repeat>
+                                        </ul>
+                                    </td>
+                                    <td>{!FLOOR(p.oli.Quantity)}</td>
+                                    <td>{!p.oli.Zahlungsmodalit_ten__c}</td>
+                                    <td class="right" style="min-width:80px">
+                                        <!--<apex:outputText value="{0, number, ###,###,###,##0.00}">
+                                            <apex:param value="{!p.oli.UnitPrice}" />
+                                        </apex:outputText>-->{!p.listPrice} €
+                                    </td>
+                                    <apex:outputPanel rendered="{!oli1Discount != 0}" layout="none">
+                                        <td class="right" style="min-width:70px">
+                                            <apex:outputPanel rendered="{!p.oli.Discount != null && p.oli.Discount != 0}" layout="none">
+                                                {!p.oli.Discount} %
+                                            </apex:outputPanel>
+                                        </td>
+                                    </apex:outputPanel>
+                                    <td class="right" style="min-width:80px">
+                                        <!--<apex:outputText value="{0, number, ###,###,###,##0.00}">
+                                            <apex:param value="{!p.oli.St_ckpreis__c}" />
+                                        </apex:outputText>-->{!p.unitPrice} €
+                                    </td>
+                                </tr>
+                                <apex:variable var="pos1" value="{!VALUE(pos1) + 1}"/>
+                            </apex:repeat>
+                        </table>
+                        <table class="summary">
+                            <apex:outputPanel rendered="{!oli1Discount != 0}" layout="none">
+                                <tr>
+                                    <td style="width:50px;"></td>
+                                    <td>Listenpreis pro Monat</td>
+                                    <td class="right">
+                                        <!--<apex:outputText value="{0, number, ###,###,###,##0.00}">
+                                            <apex:param value="{!oli1ListPrice}" />
+                                        </apex:outputText>-->{!oli1ListPriceCurrency} €
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="width:50px;"></td>
+                                    <td>Rabatt pro Monat</td>
+                                    <td class="right">
+                                        <apex:outputText value="{0, number, ###,###,###,##0.00}">
+                                            <apex:param value="{!oli1Discount}" />
+                                        </apex:outputText> €
+                                    </td>
+                                </tr>
+                            </apex:outputPanel>
+                            <tr class="total">
+                                <td style="width:50px;"></td>
+                                <td class="bold">Gesamtpreis pro Monat</td>
+                                <td class="bold right">
+                                    <!--<apex:outputText value="{0, number, ###,###,###,##0.00}">
+                                        <apex:param value="{!oli1TotalAmount}" />
+                                    </apex:outputText>-->{!oli1TotalAmountCurrency} €
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="width:50px;"></td>
+                                <td></td>
+                                <td class="bold right">(zzgl. gesetzlicher MwSt.)</td>
+                            </tr>
+                        </table>
+                    </div>
+                    
+                </div>
+            </apex:outputPanel>
+            
+            <!-- PAGE 4 -->
+            <apex:outputPanel rendered="{!products2.size > 0}" layout="none">
+                <div class="new_page">
+                    <div class="quote_header second">
+                        <table>
+                            <td class="headline">
+                                Angebot {!opp.Name}<br/>
+                                Nachsorge Tele-Therapie-Plattform
+                            </td>
+                            <td class="date">
+                                Datum: {!quoteDate}
+                            </td>
+                        </table>
+                    </div>
+                    
+                    <div class="products">
+                        <table>
+                            <tr>
+                                <th style="width:50px;">Pos.</th>
+                                <th class="product_description">Bezeichnung</th>
+                                <th>Menge<br/>(Stück)</th>
+                                <th>Fälligkeit</th>
+                                <th style="min-width:80px">Listen-<br/>preis (€)</th>
+                                <th style="{!IF(oli2Discount != 0, 'min-width:70px', 'display:none')}">Rabatt<br/>(%)</th>
+                                <th style="min-width:80px">Stück-<br/>preis (€)</th>
+                            </tr>
+                            <apex:variable value="1" var="pos2"/>
+                            <apex:repeat value="{!products2}" var="p">
+                                <tr class="product">
+                                    <td style="width:50px;">{!pos2}</td>
+                                    <td class="product_description">
+                                        <div class="product_name">{!p.oli.product2.Name}</div>
+                                        <ul>
+                                            <apex:repeat value="{!p.specs}" var="s">
+                                                <apex:outputPanel rendered="{!s != null}" layout="none">
+                                                    <li>&#8226; {!s}</li>
+                                                </apex:outputPanel>
+                                            </apex:repeat>
+                                        </ul>
+                                    </td>
+                                    <td>{!FLOOR(p.oli.Quantity)}</td>
+                                    <td>variabel pro<br/>Therapie-<br/>modul</td>
+                                    <td class="right" style="min-width:80px">
+                                        <!--<apex:outputText value="{0, number, ###,###,###,##0.00}">
+                                            <apex:param value="{!p.oli.UnitPrice}" />
+                                        </apex:outputText>-->{!p.listPrice} €
+                                    </td>
+                                    <apex:outputPanel rendered="{!oli2Discount != 0}" layout="none">
+                                        <td class="right" style="min-width:70px">
+                                            <apex:outputPanel rendered="{!p.oli.Discount != null && p.oli.Discount != 0}" layout="none">
+                                                {!p.oli.Discount} %
+                                            </apex:outputPanel>
+                                        </td>
+                                    </apex:outputPanel>
+                                    <td class="right" style="min-width:80px">
+                                        <!--<apex:outputText value="{0, number, ###,###,###,##0.00}">
+                                            <apex:param value="{!p.oli.St_ckpreis__c}" />
+                                        </apex:outputText>-->{!p.unitPrice} €
+                                    </td>
+                                </tr>
+                                <apex:variable var="pos2" value="{!VALUE(pos2) + 1}"/>
+                            </apex:repeat>
+                        </table>
+                        <table class="summary">
+                            <apex:outputPanel rendered="{!oli2Discount != 0}" layout="none">
+                                <tr>
+                                    <td style="width:50px;"></td>
+                                    <td>Listenpreis pro Therapiemodul (variabel)</td>
+                                    <td class="right">
+                                        <!--<apex:outputText value="{0, number, ###,###,###,##0.00}">
+                                            <apex:param value="{!oli2ListPrice}" />
+                                        </apex:outputText>-->{!oli2ListPriceCurrency} €
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="width:50px;"></td>
+                                    <td>Rabatt pro Therapiemodul</td>
+                                    <td class="right">
+                                        <apex:outputText value="{0, number, ###,###,###,##0.00}">
+                                            <apex:param value="{!oli2Discount}" />
+                                        </apex:outputText> €
+                                    </td>
+                                </tr>
+                            </apex:outputPanel>
+                            <tr class="total">
+                                <td style="width:50px;"></td>
+                                <td class="bold">Gesamtpreis pro Therapiemodul (variabel)</td>
+                                <td class="bold right">
+                                    <!--<apex:outputText value="{0, number, ###,###,###,##0.00}">
+                                        <apex:param value="{!oli2TotalAmount}" />
+                                    </apex:outputText>-->{!oli2TotalAmountCurrency} €
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="width:50px;"></td>
+                                <td></td>
+                                <td class="bold right">(zzgl. gesetzlicher MwSt.)</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="therapiemodul">
+                        <p style="font-size: 9px">
+                            *Die Kosten pro erbrachtes und abrechenbares Therapiemodul basieren auf der Grundlage des dahinterstehenden medizinisches Konzeptes,
+                            z.B. der multimodalen oder unimodalen Tele-Reha-Nachsorge.Die Kosten für die Nutzung der Software sowie der möglichen Auslagerung der Betreuung 
+                            der Patienten*innen in der Nachsorge betragen jeweils 29% von den Einnahmen pro Therapiemodul. 
+                            Die Kosten entstehen somit nur wenn abrechenbare Therapieeinheiten erfolgreich durchgeführt wurden.
+                        </p>
+                    </div>
+                </div>
+            </apex:outputPanel>
+            
+            <!-- PAGE 5 -->
+            <apex:outputPanel rendered="{!products3.size > 0}" layout="none">
+                <div class="new_page">
+                    <div class="quote_header second">
+                        <table>
+                            <td class="headline">
+                                Angebot {!opp.Name}<br/>
+                                Service-Leistungen
+                            </td>
+                            <td class="date">
+                                Datum: {!quoteDate}
+                            </td>
+                        </table>
+                    </div>
+                    
+                    <div class="products">
+                        <table>
+                            <tr>
+                                <th style="width:50px;">Pos.</th>
+                                <th class="product_description">Bezeichnung</th>
+                                <th>Menge<br/>(Stück)</th>
+                                <th>Fälligkeit</th>
+                                <th style="min-width:80px">Listen-<br/>preis (€)</th>
+                                <th style="{!IF(oli3Discount != 0, 'min-width:70px', 'display:none')}">Rabatt<br/>(%)</th>
+                                <th style="min-width:80px">Stück-<br/>preis (€)</th>
+                            </tr>
+                            <apex:variable value="1" var="pos3"/>
+                            <apex:repeat value="{!products3}" var="p">
+                                <tr class="product">
+                                    <td style="width:50px;">{!pos3}</td>
+                                    <td class="product_description">
+                                        <div class="product_name">{!p.oli.Product2.Name}</div>
+                                        <ul>
+                                            <apex:repeat value="{!p.specs}" var="s">
+                                                <apex:outputPanel rendered="{!s != null}" layout="none">
+                                                    <li>&#8226; {!s}</li>
+                                                </apex:outputPanel>
+                                            </apex:repeat>
+                                        </ul>
+                                    </td>
+                                    <td>{!FLOOR(p.oli.Quantity)}</td>
+                                    <td>{!p.oli.Zahlungsmodalit_ten__c}</td>
+                                    <td class="right" style="min-width:80px">
+                                        <!--<apex:outputText value="{0, number, ###,###,###,##0.00}">
+                                            <apex:param value="{!p.oli.UnitPrice}" />
+                                        </apex:outputText>-->{!p.listPrice} €
+                                    </td>
+                                    <apex:outputPanel rendered="{!oli3Discount != 0}" layout="none">
+                                        <td class="right" style="min-width:70px">
+                                            <apex:outputPanel rendered="{!p.oli.Discount != null && p.oli.Discount != 0}" layout="none">
+                                                {!p.oli.Discount} %
+                                            </apex:outputPanel>
+                                        </td>
+                                    </apex:outputPanel>
+                                    <td class="right" style="min-width:80px">
+                                        <!--<apex:outputText value="{0, number, ###,###,###,##0.00}">
+                                            <apex:param value="{!p.oli.St_ckpreis__c}" />
+                                        </apex:outputText>-->{!p.unitPrice} €
+                                    </td>
+                                </tr>
+                                <apex:variable var="pos3" value="{!VALUE(pos3) + 1}"/>
+                            </apex:repeat>
+                        </table>
+                        <table class="summary">
+                            <apex:outputPanel rendered="{!oli3Discount != 0}" layout="none">
+                                <tr>
+                                    <td style="width:50px;"></td>
+                                    <td>Listenpreis einmalig</td>
+                                    <td class="right">
+                                        <!--<apex:outputText value="{0, number, ###,###,###,##0.00}">
+                                            <apex:param value="{!oli3ListPrice}" />
+                                        </apex:outputText>-->{!oli3ListPriceCurrency} €
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="width:50px;"></td>
+                                    <td>Rabatt einmalig</td>
+                                    <td class="right">
+                                        <apex:outputText value="{0, number, ###,###,###,##0.00}">
+                                            <apex:param value="{!oli3Discount}" />
+                                        </apex:outputText> €
+                                    </td>
+                                </tr>
+                            </apex:outputPanel>
+                            <tr class="total">
+                                <td style="width:50px;"></td>
+                                <td class="bold">Gesamtpreis einmalig</td>
+                                <td class="bold right">
+                                    <!--<apex:outputText value="{0, number, ###,###,###,##0.00}">
+                                        <apex:param value="{!oli3TotalAmount}" />
+                                    </apex:outputText>-->{!oli3TotalAmountCurrency} €
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="width:50px;"></td>
+                                <td></td>
+                                <td class="bold right">(zzgl. gesetzlicher MwSt.)</td>
+                            </tr>
+                        </table>
+                    </div>
+                    
+                </div>
+            </apex:outputPanel>
+            
+            <!-- PAGE 6 -->
+            <div class="new_page">
+                <div class="quote_header second">
+                    <table>
+                        <td class="headline">
+                            Bestellschein zum Angebot {!opp.Name}<br/>
+                            Tele-Therapie-Plattform für {!opp.Account.Name}
+                        </td>
+                        <td class="date">
+                            Datum: {!quoteDate}
+                        </td>
+                    </table>
+                </div>
+                
+                <div id="terms">
+                    <table>
+                        <tr>
+                        	<td style="width:45%">Beginn der Laufzeit:</td>
+                            <td>{!startDate}</td>
+                        </tr>
+                        <tr>
+                       		<apex:outputPanel rendered="{!opp.Vertragslaufzeit_in_Monaten__c != null}" layout="none">
+                                <td>Nutzungsdauer:</td>
+                            <td>{!opp.Vertragslaufzeit_in_Monaten__c} Monate</td>
+                            </apex:outputPanel>
+                        </tr>
+                        <tr>
+                        	<td>Rechnungsstellung:</td>
+                            <td>Nach Unterschrift dieses Angebots und nach Zahlungsmodalität</td>
+                        </tr>
+                        <tr>
+                        	<td>Zahlungsbedingungen:</td>
+                            <td>14 Tage per Überweisung</td>
+                        </tr>
+                        <tr>
+                        	<apex:outputPanel rendered="{!opp.Zahlungsmodalit_ten__c != null}" layout="none">
+                                <td>Zahlungsmodalitäten:</td>
+                            <td>{!opp.Zahlungsmodalit_ten__c}</td>
+                            </apex:outputPanel>
+                        </tr>
+                             
+                        <tr>
+                        	<td>Gültigkeit des Angebots:</td>
+                            <td>{!validityDate}</td>
+                        </tr>
+                        <tr>
+                        	<td>Exklusivität des Angebots:</td>
+                            <td>Dieses Vertragsangebot ist nur für Sie erstellt. Eine Weitergabe dieser Konditionen schließen wir aus.</td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <div class="letter">
+                    <apex:outputPanel rendered="{!opp.Zusatzinformationen_Template__c != null && opp.Zusatzinformationen_Template__c != ''}" layout="none">
+                        <p>
+                            {!opp.Zusatzinformationen_Template__c}
+                        </p>
+                    </apex:outputPanel>
+                    <p>
+                        Wir freuen uns Ihnen ein attraktives Angebot gemacht zu haben. Melden Sie sich gern bei Fragen.<br/>
+                        Mit Ihrer Unterschrift bestätigen Sie, dass Sie berechtigt sind im Namen Ihres Arbeitgebers zu handeln und dieses Angebot und die oben genannten Bedingungen anzunehmen.
+                    </p>
+                    <p style="padding-bottom:100px">
+                        Bitte beachten Sie, dass die Bedingungen dieses Angebots in Verbindung mit den Allgemeinen Geschäftsbedingungen von GOREHA GmbH stehen.
+                    </p>
+                    <table>
+                        <td style="width:260px">
+                            Ort, Datum
+                        </td>
+                        
+                        <td>
+                            Unterschrift Klinikleitung
+                        </td>
+                    </table>
+                </div>
+                
+            </div>
+            
+        </div>
+    </body>
+</apex:page>
