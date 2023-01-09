@@ -1,5 +1,4 @@
 <aura:component implements="flexipage:availableForAllPageTypes,force:hasRecordId,force:appHostable" access="global" controller="QuickNotesController">
-    <!--as per the CASPER Requirment-->
     <aura:attribute name="currentUserName" type="String"/> 
     <aura:attribute name="isEditable" type="Boolean" default="false" description="to edit Quick note"/>
     <aura:attribute name="notesbody" type="String" default="" description="stores notes body"/>
