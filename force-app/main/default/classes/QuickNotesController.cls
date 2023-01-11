@@ -114,6 +114,7 @@ public class QuickNotesController {
     }
     @AuraEnabled
     public static void createTask(String accId, String comment, String dueDate, String MeetingDate) {
+        CustomNotificationType Notification = [SELECT Id, DeveloperName FROM CustomNotificationType WHERE DeveloperName = 'New_Task_is_created_for_you' LIMIT 1];
         String meetDate = '';
         if(MeetingDate != null && MeetingDate != ''){
             //getting date format 2023-01-02 chnaging to 02.01.2023
@@ -122,7 +123,7 @@ public class QuickNotesController {
         }
         List<String> lstComments = new List<String>();
         List<Task> lstTasks = new List<Task>();
-        if(comment != null && comment != ''){
+        if(comment != null && comment != '' && comment.contains(',')){
             lstComments = comment.split(',');
         }
         if(lstComments.size() > 1){
@@ -140,16 +141,15 @@ public class QuickNotesController {
                 if(lstTasks.size() > 0){
                     insert lstTasks;
                 }
-                CustomNotificationType Notification = [SELECT Id, DeveloperName FROM CustomNotificationType WHERE DeveloperName = 'New_Task_is_created_for_you' LIMIT 1];
-                for(Task t : lstTasks){
-                    Messaging.CustomNotification singleNotification = new Messaging.CustomNotification();
-                    singleNotification.setTitle(t.Subject);
-                    singleNotification.setBody('Please Review');
-                    singleNotification.setNotificationTypeId(Notification.Id);
-                    singleNotification.setTargetId(t.Id);
-                    set<String> setUser = new set<String>{UserInfo.getUserId()};
+                set<String> setUser = new set<String>{UserInfo.getUserId()};
+                    for(Task t : lstTasks){
+                        Messaging.CustomNotification singleNotification = new Messaging.CustomNotification();
+                        singleNotification.setTitle(t.Subject);
+                        singleNotification.setBody('Please Review');
+                        singleNotification.setNotificationTypeId(Notification.Id);
+                        singleNotification.setTargetId(t.Id);
                         singleNotification.send(setUser); 
-                }
+                    }
             }catch(Exception e){
                 System.debug('e->'+e);
             }
@@ -163,7 +163,6 @@ public class QuickNotesController {
                 t.Description = comment.stripHtmlTags();
                 t.ActivityDate = Date.valueOf(dueDate);
                 insert t;
-                CustomNotificationType Notification = [SELECT Id, DeveloperName FROM CustomNotificationType WHERE DeveloperName = 'New_Task_is_created_for_you' LIMIT 1];
                 Messaging.CustomNotification singleNotification = new Messaging.CustomNotification();
                 singleNotification.setTitle(t.Subject);
                 singleNotification.setBody('Please Review');
